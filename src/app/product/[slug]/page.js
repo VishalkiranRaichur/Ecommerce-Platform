@@ -24,8 +24,17 @@ export default function ProductDetailPage({ params }) {
     return null
   }
 
+  // Handle both regular image paths and data URLs
+  const getImageSrc = (image) => {
+    if (!image) return '/placeholder-product.jpg'
+    // If it's a data URL (starts with "data:"), use it directly
+    if (image.startsWith('data:')) return image
+    // Otherwise, assume it's a filename in /products/
+    return `/products/${image}`
+  }
+
   const images = product.images && product.images.length > 0 
-    ? product.images.map(img => `/products/${img}`)
+    ? product.images.map(img => getImageSrc(img))
     : ['/placeholder-product.jpg']
 
   const similarProducts = getSimilarProducts(product.id, 4)

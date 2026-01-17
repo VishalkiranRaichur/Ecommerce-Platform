@@ -3,8 +3,17 @@ import Link from 'next/link'
 import Badge from './Badge'
 
 export default function ProductCard({ product }) {
+  // Handle both regular image paths and data URLs
+  const getImageSrc = (image) => {
+    if (!image) return '/placeholder-product.jpg'
+    // If it's a data URL (starts with "data:"), use it directly
+    if (image.startsWith('data:')) return image
+    // Otherwise, assume it's a filename in /products/
+    return `/products/${image}`
+  }
+
   const mainImage = product.images && product.images.length > 0 
-    ? `/products/${product.images[0]}` 
+    ? getImageSrc(product.images[0])
     : '/placeholder-product.jpg'
 
   return (

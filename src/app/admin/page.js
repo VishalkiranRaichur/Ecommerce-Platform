@@ -266,8 +266,17 @@ export default function AdminPage() {
 }
 
 function ProductView({ product, onEdit }) {
+  // Handle both regular image paths and data URLs
+  const getImageSrc = (image) => {
+    if (!image) return null
+    // If it's a data URL (starts with "data:"), use it directly
+    if (image.startsWith('data:')) return image
+    // Otherwise, assume it's a filename in /products/
+    return `/products/${image}`
+  }
+
   const mainImage = product.images && product.images.length > 0 
-    ? `/products/${product.images[0]}` 
+    ? getImageSrc(product.images[0])
     : null
 
   return (
@@ -467,14 +476,18 @@ function EditProductForm({ product, onSave, onCancel, loading, onImageUpload, on
         {/* Existing Images */}
         {product.images && product.images.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {product.images.map((image, index) => (
+            {product.images.map((image, index) => {
+              // Handle both regular image paths and data URLs
+              const imageSrc = image.startsWith('data:') ? image : `/products/${image}`
+              return (
               <div key={index} className="relative group">
                 <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
                   <Image
-                    src={`/products/${image}`}
+                    src={imageSrc}
                     alt={`${product.name} ${index + 1}`}
                     fill
                     className="object-cover"
+                    unoptimized={image.startsWith('data:')} // Disable optimization for data URLs
                   />
                 </div>
                 <button
@@ -487,7 +500,8 @@ function EditProductForm({ product, onSave, onCancel, loading, onImageUpload, on
                   </svg>
                 </button>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
