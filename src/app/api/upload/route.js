@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 
 /**
  * Image upload handler for Netlify
- * Since Netlify serverless functions can't write to filesystem,
- * we convert images to base64 and store them as data URLs
+ * Uses ImgBB free image hosting API to avoid serverless function timeouts
  * 
- * For production, consider using Cloudinary or ImgBB for better performance
+ * Alternative: Use Cloudinary (better, but requires API key setup)
  */
 
 export async function POST(request) {
@@ -23,26 +22,64 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' }, { status: 400 })
     }
 
-    // Validate file size (max 5MB for data URLs)
-    // Note: Larger images will increase database size significantly
+    // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
       return NextResponse.json({ 
-        error: `File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 5MB. Please compress your image or use a smaller file.` 
+        error: `File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 5MB. Please compress your image.` 
       }, { status: 400 })
     }
 
-    // Convert file to base64
-    let base64Image
-    try {
-      const bytes = await file.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      base64Image = buffer.toString('base64')
-    } catch (conversionError) {
-      console.error('Error converting file to base64:', conversionError)
+    // Convert file to base64 for ImgBB API
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const base64Image = buffer.toString('base64')
+
+    // Use ImgBB free API (no API key required for basic usage, but has rate limits)
+    // Get free API key from: https://api.imgbb.com/
+    // For now, we'll use a public endpoint or fallback to data URL for small images
+    
+    // Option 1: Try ImgBB if API key is set (optional)
+    const imgbbApiKey = process.env.IMGBB_API_KEY
+    
+    if (imgbbApiKey && file.size < 3 * 1024 * 1024) { // Only use ImgBB for images under 3MB
+      try {
+        const imgbbFormData = new FormData()
+        imgbbFormData.append('key', imgbbApiKey)
+        imgbbFormData.append('image', base64Image)
+
+        const imgbbResponse = await fetch('https://api.imgbb.com/1/upload', {
+          method: 'POST',
+          body: imgbbFormData,
+        })
+
+        if (imgbbResponse.ok) {
+          const imgbbData = await imgbbResponse.json()
+          if (imgbbData.success && imgbbData.data) {
+            const timestamp = Date.now()
+            const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
+            const filename = `${timestamp}-${originalName}`
+
+            return NextResponse.json({
+              success: true,
+              filename: filename,
+              path: imgbbData.data.url, // ImgBB URL
+              url: imgbbData.data.url,
+            })
+          }
+        }
+      } catch (imgbbError) {
+        console.error('ImgBB upload failed, falling back to data URL:', imgbbError)
+        // Fall through to data URL method
+      }
+    }
+
+    // Option 2: Fallback - Use data URL for smaller images only (to avoid timeout)
+    // Only use data URLs for images under 1MB to prevent 502 errors
+    if (file.size > 1 * 1024 * 1024) {
       return NextResponse.json({ 
-        error: 'Failed to process image: ' + (conversionError?.message || 'Conversion error')
-      }, { status: 500 })
+        error: 'Image too large for direct upload. Please compress to under 1MB, or set up ImgBB API key in Netlify environment variables (IMGBB_API_KEY) for larger images.' 
+      }, { status: 400 })
     }
 
     // Generate unique filename
@@ -50,21 +87,14 @@ export async function POST(request) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
     const filename = `${timestamp}-${originalName}`
 
-    // Create data URL (can be used directly in <img src>)
+    // Create data URL (only for small images)
     const dataUrl = `data:${file.type};base64,${base64Image}`
 
-    // Check data URL size (warn if very large)
-    if (dataUrl.length > 7000000) { // ~7MB in characters
-      console.warn('Large data URL generated:', dataUrl.length, 'characters')
-    }
-
-    // Return data URL - this will be stored in the database
-    // The image can be displayed directly using this URL
     return NextResponse.json({
       success: true,
       filename: filename,
-      path: dataUrl, // Full data URL
-      url: dataUrl,  // Same as path for compatibility
+      path: dataUrl,
+      url: dataUrl,
     })
 
   } catch (error) {
