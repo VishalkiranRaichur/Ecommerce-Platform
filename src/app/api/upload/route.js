@@ -23,10 +23,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' }, { status: 400 })
     }
 
-    // Validate file size (max 2MB for data URLs - smaller limit for database storage)
-    const maxSize = 2 * 1024 * 1024 // 2MB (reduced for database storage)
+    // Validate file size (max 5MB for data URLs)
+    // Note: Larger images will increase database size significantly
+    const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 2MB for direct upload. For larger images, use Cloudinary.' }, { status: 400 })
+      return NextResponse.json({ 
+        error: `File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is 5MB. Please compress your image or use a smaller file.` 
+      }, { status: 400 })
     }
 
     // Convert file to base64
