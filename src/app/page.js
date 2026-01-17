@@ -6,8 +6,16 @@ import InstagramButton from '@/components/InstagramButton'
 
 async function getFeaturedProducts() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const response = await fetch(`${baseUrl}/api/products`, {
+    // For server components, use absolute URL or relative URL
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+                   'http://localhost:3000'
+    
+    const apiUrl = typeof window === 'undefined' 
+      ? `${baseUrl}/api/products` 
+      : '/api/products'
+    
+    const response = await fetch(apiUrl, {
       cache: 'no-store', // Always fetch fresh data
     })
     
