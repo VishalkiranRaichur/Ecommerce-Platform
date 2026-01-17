@@ -9,9 +9,11 @@ function getSql() {
     const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL
     
     if (!connectionString) {
-      // During build time, throw a helpful error
-      // But this will only be called at runtime in API routes
-      throw new Error('DATABASE_URL environment variable is not set. Please set it in Netlify environment variables.')
+      // During build time or if not configured, return a function that throws
+      // This allows the build to succeed but will fail at runtime with a helpful error
+      return function sql(strings, ...values) {
+        throw new Error('DATABASE_URL environment variable is not set. Please set it in Netlify environment variables.')
+      }
     }
     
     sqlClient = neon(connectionString)
@@ -20,20 +22,11 @@ function getSql() {
   return sqlClient
 }
 
-// Export sql as a lazy getter
-// This way it's only initialized when actually used (at runtime, not build time)
-export const sql = new Proxy(function() {}, {
-  get(target, prop) {
-    const client = getSql()
-    if (typeof client[prop] === 'function') {
-      return (...args) => client[prop](...args)
-    }
-    return client[prop]
-  },
-  apply(target, thisArg, argumentsList) {
-    const client = getSql()
-    return client.apply(thisArg, argumentsList)
-  }
-})
+// Export sql as a tagged template function
+// This is only initialized when actually called (at runtime, not build time)
+export const sql = (strings, ...values) => {
+  const client = getSql()
+  return client(strings, ...values)
+}
 
 export { getSql }
