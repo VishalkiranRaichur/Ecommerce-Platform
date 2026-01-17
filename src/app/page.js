@@ -1,12 +1,29 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getFeaturedProducts } from '@/data/products'
 import ProductCard from '@/components/ProductCard'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import InstagramButton from '@/components/InstagramButton'
 
-export default function Home() {
-  const featuredProducts = getFeaturedProducts()
+async function getFeaturedProducts() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/products`, {
+      cache: 'no-store', // Always fetch fresh data
+    })
+    
+    if (response.ok) {
+      const products = await response.json()
+      return products.filter((product) => product.featured)
+    }
+  } catch (error) {
+    console.error('Error fetching products:', error)
+  }
+  
+  return []
+}
+
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts()
 
   const categories = [
     { name: 'Blouses', image: '/category-blouses.jpg', link: '/shop?category=Blouses' },

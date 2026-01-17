@@ -2,23 +2,79 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { getProductBySlug, getSimilarProducts } from '@/data/products'
+import { useRouter, useParams } from 'next/navigation'
 import Badge from '@/components/Badge'
 import ProductCard from '@/components/ProductCard'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import InstagramButton from '@/components/InstagramButton'
 
-export default function ProductDetailPage({ params }) {
+export default function ProductDetailPage() {
   const router = useRouter()
-  const product = getProductBySlug(params.slug)
+  const params = useParams()
+  const slug = params.slug
+  
+  const [product, setProduct] = useState(null)
+  const [similarProducts, setSimilarProducts] = useState([])
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!product) {
-      router.push('/not-found')
+    async function loadProduct() {
+      try {
+        // Fetch all products and find by slug
+        const response = await fetch('/api/products', {
+          cache: 'no-store'
+        })
+        
+        if (response.ok) {
+          const products = await response.json()
+          const foundProduct = products.find((p) => p.slug === slug)
+          
+          if (foundProduct) {
+            setProduct(foundProduct)
+            
+            // Get similar products
+            const similar = products
+              .filter((p) => p.id !== foundProduct.id && p.category === foundProduct.category)
+              .slice(0, 4)
+            setSimilarProducts(similar)
+          } else {
+            router.push('/not-found')
+          }
+        } else {
+          router.push('/not-found')
+        }
+      } catch (error) {
+        console.error('Error loading product:', error)
+        router.push('/not-found')
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [product, router])
+
+    if (slug) {
+      loadProduct()
+    }
+  }, [slug, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="h-96 bg-gray-200 rounded-lg"></div>
+              <div className="space-y-4">
+                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-24 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!product) {
     return null
@@ -29,6 +85,8 @@ export default function ProductDetailPage({ params }) {
     if (!image) return '/placeholder-product.jpg'
     // If it's a data URL (starts with "data:"), use it directly
     if (image.startsWith('data:')) return image
+    // If it's a full URL (starts with "http"), use it directly
+    if (image.startsWith('http')) return image
     // Otherwise, assume it's a filename in /products/
     return `/products/${image}`
   }
@@ -36,15 +94,6 @@ export default function ProductDetailPage({ params }) {
   const images = product.images && product.images.length > 0 
     ? product.images.map(img => getImageSrc(img))
     : ['/placeholder-product.jpg']
-
-  const similarProducts = getSimilarProducts(product.id, 4)
-
-  const formatWhatsAppMessage = () => {
-    const productUrl = typeof window !== 'undefined' 
-      ? window.location.href 
-      : ''
-    return `Hi! I'm interested in:\n\n${product.name}\nPrice: ₹${product.price.toLocaleString('en-IN')}\nLink: ${productUrl}`
-  }
 
   return (
     <div className="min-h-screen bg-white py-8">
@@ -60,6 +109,7 @@ export default function ProductDetailPage({ params }) {
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                unoptimized={images[selectedImageIndex].startsWith('data:') || images[selectedImageIndex].startsWith('http')}
               />
             </div>
             {images.length > 1 && (
@@ -80,6 +130,7 @@ export default function ProductDetailPage({ params }) {
                       fill
                       className="object-cover"
                       sizes="96px"
+                      unoptimized={image.startsWith('data:') || image.startsWith('http')}
                     />
                   </button>
                 ))}
@@ -108,7 +159,7 @@ export default function ProductDetailPage({ params }) {
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag) => (
+                {product.tags && product.tags.map((tag) => (
                   <Badge key={tag} variant="default">
                     {tag}
                   </Badge>

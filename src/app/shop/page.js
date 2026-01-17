@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useMemo, Suspense } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { products, getProductsByCategory } from '@/data/products'
 import ProductCard from '@/components/ProductCard'
 import SearchBar from '@/components/SearchBar'
 import Filters from '@/components/Filters'
@@ -14,11 +13,33 @@ function ShopContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [sortBy, setSortBy] = useState('default')
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch products from database API
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const response = await fetch('/api/products', {
+          cache: 'no-store'
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setProducts(data)
+        }
+      } catch (error) {
+        console.error('Error loading products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProducts()
+  }, [])
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = selectedCategory === 'All' 
       ? products 
-      : getProductsByCategory(selectedCategory)
+      : products.filter((product) => product.category === selectedCategory)
 
     // Apply search filter
     if (searchQuery.trim()) {
@@ -27,7 +48,7 @@ function ShopContent() {
         (product) =>
           product.name.toLowerCase().includes(query) ||
           product.description.toLowerCase().includes(query) ||
-          product.tags.some((tag) => tag.toLowerCase().includes(query))
+          (product.tags && product.tags.some((tag) => tag.toLowerCase().includes(query)))
       )
     }
 
@@ -48,7 +69,25 @@ function ShopContent() {
     }
 
     return sorted
-  }, [searchQuery, selectedCategory, sortBy])
+  }, [searchQuery, selectedCategory, sortBy, products])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-100 rounded-lg h-96"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-white py-8">
