@@ -29,7 +29,16 @@ export async function GET() {
     return NextResponse.json(formattedProducts)
   } catch (error) {
     console.error('Error reading products:', error)
-    return NextResponse.json({ error: 'Failed to load products' }, { status: 500 })
+    
+    // Check if it's a database connection error
+    const errorMessage = error.message || 'Failed to load products'
+    const isDbError = errorMessage.includes('DATABASE_URL') || errorMessage.includes('connection')
+    
+    return NextResponse.json({ 
+      error: isDbError 
+        ? 'Database connection error. Please check DATABASE_URL environment variable.'
+        : 'Failed to load products: ' + errorMessage
+    }, { status: 500 })
   }
 }
 
