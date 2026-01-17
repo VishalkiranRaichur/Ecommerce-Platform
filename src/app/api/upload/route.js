@@ -41,14 +41,17 @@ export async function POST(request) {
     // Option 1: Use ImgBB if API key is set (for all images up to 5MB)
     if (imgbbApiKey) {
       try {
-        // ImgBB API expects form data with key and image (base64 string)
-        const imgbbFormData = new FormData()
-        imgbbFormData.append('key', imgbbApiKey)
-        imgbbFormData.append('image', base64Image)
+        // ImgBB API expects URL-encoded form data with key and image (base64 string)
+        const imgbbParams = new URLSearchParams()
+        imgbbParams.append('key', imgbbApiKey)
+        imgbbParams.append('image', base64Image)
 
         const imgbbResponse = await fetch('https://api.imgbb.com/1/upload', {
           method: 'POST',
-          body: imgbbFormData,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: imgbbParams.toString(),
         })
 
         const imgbbData = await imgbbResponse.json()
@@ -69,7 +72,7 @@ export async function POST(request) {
           const errorMsg = imgbbData?.error?.message || imgbbData?.error?.message || JSON.stringify(imgbbData)
           console.error('ImgBB API error:', imgbbData)
           return NextResponse.json({ 
-            error: `ImgBB upload failed: ${errorMsg}. Please check your IMGBB_API_KEY.` 
+            error: `ImgBB upload failed: ${errorMsg}. Please verify your IMGBB_API_KEY is correct.` 
           }, { status: 500 })
         }
       } catch (imgbbError) {
