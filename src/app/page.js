@@ -1,33 +1,38 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { sql } from '@/lib/db'
 import ProductCard from '@/components/ProductCard'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import InstagramButton from '@/components/InstagramButton'
 
 async function getFeaturedProducts() {
   try {
-    // For server components, use absolute URL or relative URL
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
-                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-                   'http://localhost:3000'
+    const products = await sql`
+      SELECT 
+        id,
+        name,
+        slug,
+        price,
+        category,
+        description,
+        images,
+        tags,
+        featured
+      FROM products
+      WHERE featured = true
+      ORDER BY id ASC
+    `
     
-    const apiUrl = typeof window === 'undefined' 
-      ? `${baseUrl}/api/products` 
-      : '/api/products'
-    
-    const response = await fetch(apiUrl, {
-      cache: 'no-store', // Always fetch fresh data
-    })
-    
-    if (response.ok) {
-      const products = await response.json()
-      return products.filter((product) => product.featured)
-    }
+    // Format products
+    return products.map(product => ({
+      ...product,
+      images: Array.isArray(product.images) ? product.images : (product.images || []),
+      tags: Array.isArray(product.tags) ? product.tags : (product.tags || []),
+    }))
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching featured products:', error)
+    return []
   }
-  
-  return []
 }
 
 export default async function Home() {
