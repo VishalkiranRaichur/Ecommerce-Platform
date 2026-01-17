@@ -117,21 +117,29 @@ export default function AdminPage() {
         body: formData,
       })
 
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({ error: 'Network error' }))
+        throw new Error(errorData.error || `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`)
+      }
+
       const uploadData = await uploadResponse.json()
 
       if (uploadData.success) {
         const product = products.find(p => p.id === productId)
-        const updatedImages = [...(product.images || []), uploadData.filename]
+        // Use the URL/path from the response (could be data URL or regular path)
+        const imageUrl = uploadData.url || uploadData.path || uploadData.filename
+        const updatedImages = [...(product.images || []), imageUrl]
         
         await handleSaveProduct({
           ...product,
           images: updatedImages,
         })
       } else {
-        alert('Failed to upload image: ' + uploadData.error)
+        throw new Error(uploadData.error || 'Upload failed')
       }
     } catch (error) {
-      alert('Error uploading image. Please try again.')
+      console.error('Upload error:', error)
+      alert('Failed to upload image: ' + (error.message || error.toString() || 'Unknown error'))
     } finally {
       setUploading(false)
     }

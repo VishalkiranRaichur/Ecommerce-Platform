@@ -56,8 +56,10 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Error uploading file:', error)
+    const errorMessage = error?.message || error?.toString() || 'Unknown error occurred'
     return NextResponse.json({ 
-      error: 'Failed to upload file: ' + (error.message || 'Unknown error') 
+      error: `Failed to upload file: ${errorMessage}`,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 })
   }
 }
