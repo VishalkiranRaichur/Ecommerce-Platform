@@ -122,7 +122,7 @@ export async function PUT(request) {
         price = COALESCE(${body.price !== undefined ? parseFloat(body.price) : null}, price),
         category = COALESCE(${body.category || null}, category),
         description = COALESCE(${body.description || null}, description),
-        images = COALESCE(${body.images !== undefined ? JSON.stringify(body.images) : null}, images),
+        images = COALESCE(${body.images !== undefined ? JSON.stringify(Array.isArray(body.images) ? body.images : [body.images]) : null}, images),
         tags = COALESCE(${body.tags !== undefined ? JSON.stringify(body.tags) : null}, tags),
         featured = COALESCE(${body.featured !== undefined ? body.featured : null}, featured),
         updated_at = NOW()
