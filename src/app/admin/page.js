@@ -51,10 +51,31 @@ export default function AdminPage() {
   const loadProducts = async () => {
     try {
       const response = await fetch('/api/products')
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to load products' }))
+        console.error('API Error:', errorData)
+        setError('Failed to load products. Please check your database connection.')
+        setProducts([])
+        return
+      }
+      
       const data = await response.json()
-      setProducts(data)
+      
+      // Check if data is an array
+      if (Array.isArray(data)) {
+        setProducts(data)
+      } else if (data.error) {
+        console.error('API returned error:', data.error)
+        setError(data.error)
+        setProducts([])
+      } else {
+        setProducts([])
+      }
     } catch (error) {
       console.error('Error loading products:', error)
+      setError('Failed to connect to server. Please check your connection and try again.')
+      setProducts([])
     }
   }
 
@@ -187,9 +208,35 @@ export default function AdminPage() {
             Manage your products: update prices, descriptions, and upload images.
           </p>
           <p className="text-sm text-gray-500">
-            Note: Changes are saved to the database file and will persist after page refresh.
+            Note: Changes are saved to the Neon database and will persist after page refresh.
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-semibold text-red-800 mb-1">Error Loading Products</h3>
+                <p className="text-sm text-red-700">{error}</p>
+                <button
+                  onClick={loadProducts}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {products.length === 0 && !error && (
+          <div className="text-center py-12">
+            <p className="text-gray-600">Loading products...</p>
+          </div>
+        )}
 
         <div className="space-y-6">
           {products.map((product) => (
