@@ -33,9 +33,17 @@ export async function POST(request) {
     }
 
     // Convert file to base64
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64Image = buffer.toString('base64')
+    let base64Image
+    try {
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      base64Image = buffer.toString('base64')
+    } catch (conversionError) {
+      console.error('Error converting file to base64:', conversionError)
+      return NextResponse.json({ 
+        error: 'Failed to process image: ' + (conversionError?.message || 'Conversion error')
+      }, { status: 500 })
+    }
 
     // Generate unique filename
     const timestamp = Date.now()
@@ -44,6 +52,11 @@ export async function POST(request) {
 
     // Create data URL (can be used directly in <img src>)
     const dataUrl = `data:${file.type};base64,${base64Image}`
+
+    // Check data URL size (warn if very large)
+    if (dataUrl.length > 7000000) { // ~7MB in characters
+      console.warn('Large data URL generated:', dataUrl.length, 'characters')
+    }
 
     // Return data URL - this will be stored in the database
     // The image can be displayed directly using this URL
