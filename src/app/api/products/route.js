@@ -80,14 +80,37 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const body = await request.json()
+    const productId = parseInt(body.id)
 
-    // Build update query dynamically based on provided fields
+    // Get current product to check if name changed
+    const currentProduct = await sql`
+      SELECT name, slug FROM products WHERE id = ${productId}
+    `
+
+    if (currentProduct.length === 0) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+
+    // Only update slug if name changed
     let updateSlug = null
-    if (body.name) {
-      updateSlug = body.name
+    if (body.name && body.name !== currentProduct[0].name) {
+      // Generate base slug from new name
+      let baseSlug = body.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
+
+      // Check if slug already exists for another product
+      const existingSlug = await sql`
+        SELECT id FROM products WHERE slug = ${baseSlug} AND id != ${productId}
+      `
+
+      // If slug exists, append product ID to make it unique
+      if (existingSlug.length > 0) {
+        updateSlug = `${baseSlug}-${productId}`
+      } else {
+        updateSlug = baseSlug
+      }
     }
 
     // Update product in database
@@ -103,7 +126,7 @@ export async function PUT(request) {
         tags = COALESCE(${body.tags !== undefined ? JSON.stringify(body.tags) : null}, tags),
         featured = COALESCE(${body.featured !== undefined ? body.featured : null}, featured),
         updated_at = NOW()
-      WHERE id = ${parseInt(body.id)}
+      WHERE id = ${productId}
       RETURNING *
     `
 
