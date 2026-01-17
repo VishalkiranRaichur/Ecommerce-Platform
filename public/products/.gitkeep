@@ -1,0 +1,3 @@
+# Place product images in this directory
+# Images should be named according to the 'images' array in src/data/products.js
+# Example: blouse-1-main.jpg, blouse-1-1.jpg, etc.

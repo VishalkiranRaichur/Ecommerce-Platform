@@ -1,0 +1,339 @@
+[
+  {
+    "id": 1,
+    "name": "Elegant Embroidered Silk Blouse",
+    "slug": "elegant-embroidered-silk-blouse",
+    "price": 2499,
+    "category": "Blouses",
+    "description": "A stunning silk blouse with intricate hand embroidery work. Perfect for festive occasions and special gatherings. Features premium quality fabric with comfortable fit.",
+    "images": [
+      "1768627302112-IMG-0227.jpeg"
+    ],
+    "tags": [
+      "silk",
+      "embroidered",
+      "festive",
+      "elegant"
+    ],
+    "featured": true
+  },
+  {
+    "id": 2,
+    "name": "Royal Banarasi Designer Blouse",
+    "slug": "royal-banarasi-designer-blouse",
+    "price": 3899,
+    "category": "Festive",
+    "description": "Exquisite Banarasi work blouse with traditional zari borders. A masterpiece of Indian craftsmanship that adds regal elegance to any ethnic ensemble.",
+    "images": [
+      "blouse-2-main.jpg",
+      "blouse-2-1.jpg"
+    ],
+    "tags": [
+      "banarasi",
+      "zari",
+      "traditional",
+      "designer"
+    ],
+    "featured": true
+  },
+  {
+    "id": 3,
+    "name": "Contemporary Floral Print Blouse",
+    "slug": "contemporary-floral-print-blouse",
+    "price": 1799,
+    "category": "Blouses",
+    "description": "Modern floral print blouse with contemporary design elements. Versatile and comfortable, perfect for daily wear or casual occasions.",
+    "images": [
+      "blouse-3-main.jpg"
+    ],
+    "tags": [
+      "print",
+      "floral",
+      "casual",
+      "modern"
+    ],
+    "featured": false
+  },
+  {
+    "id": 4,
+    "name": "Bridal Heavily Embroidered Blouse",
+    "slug": "bridal-heavily-embroidered-blouse",
+    "price": 5499,
+    "category": "Bridal",
+    "description": "Luxurious bridal blouse with heavy thread and zari embroidery. Handcrafted with attention to detail, designed to complement your wedding lehenga perfectly.",
+    "images": [
+      "blouse-4-main.jpg",
+      "blouse-4-1.jpg",
+      "blouse-4-2.jpg",
+      "blouse-4-3.jpg"
+    ],
+    "tags": [
+      "bridal",
+      "heavy-work",
+      "wedding",
+      "luxury"
+    ],
+    "featured": true
+  },
+  {
+    "id": 5,
+    "name": "New Arrival Sequined Party Blouse",
+    "slug": "new-arrival-sequined-party-blouse",
+    "price": 3299,
+    "category": "New Arrivals",
+    "description": "Latest addition to our collection! Glamorous sequined blouse perfect for parties and celebrations. Features contemporary cut with elegant sequin detailing.",
+    "images": [
+      "blouse-5-main.jpg",
+      "blouse-5-1.jpg"
+    ],
+    "tags": [
+      "sequins",
+      "party",
+      "glamour",
+      "new"
+    ],
+    "featured": true
+  },
+  {
+    "id": 6,
+    "name": "Classic Cotton Comfort Blouse",
+    "slug": "classic-cotton-comfort-blouse",
+    "price": 1299,
+    "category": "Blouses",
+    "description": "Soft cotton blouse with traditional design. Breathable fabric makes it ideal for everyday wear. Simple yet elegant with subtle embellishments.",
+    "images": [
+      "blouse-6-main.jpg"
+    ],
+    "tags": [
+      "cotton",
+      "comfort",
+      "daily-wear",
+      "simple"
+    ],
+    "featured": false
+  },
+  {
+    "id": 7,
+    "name": "Festive Mirror Work Blouse",
+    "slug": "festive-mirror-work-blouse",
+    "price": 2199,
+    "category": "Festive",
+    "description": "Beautiful mirror work blouse inspired by traditional Gujarati embroidery. Eye-catching mirror patterns that reflect light beautifully during celebrations.",
+    "images": [
+      "blouse-7-main.jpg",
+      "blouse-7-1.jpg"
+    ],
+    "tags": [
+      "mirror-work",
+      "traditional",
+      "festive",
+      "gujarati"
+    ],
+    "featured": false
+  },
+  {
+    "id": 8,
+    "name": "Designer Net Embroidered Blouse",
+    "slug": "designer-net-embroidered-blouse",
+    "price": 2999,
+    "category": "Blouses",
+    "description": "Sophisticated net fabric blouse with intricate embroidery overlay. Semi-transparent design adds modern elegance to traditional wear.",
+    "images": [
+      "blouse-8-main.jpg"
+    ],
+    "tags": [
+      "net",
+      "embroidered",
+      "designer",
+      "modern"
+    ],
+    "featured": false
+  },
+  {
+    "id": 9,
+    "name": "Bridal Red Silk with Gold Work",
+    "slug": "bridal-red-silk-gold-work",
+    "price": 4799,
+    "category": "Bridal",
+    "description": "Stunning bridal blouse in traditional red silk with lavish gold thread work. Premium quality fabric and craftsmanship for your special day.",
+    "images": [
+      "blouse-9-main.jpg",
+      "blouse-9-1.jpg",
+      "blouse-9-2.jpg"
+    ],
+    "tags": [
+      "bridal",
+      "red",
+      "gold-work",
+      "silk"
+    ],
+    "featured": true
+  },
+  {
+    "id": 10,
+    "name": "New Arrival Pastel Georgette Blouse",
+    "slug": "new-arrival-pastel-georgette-blouse",
+    "price": 1899,
+    "category": "New Arrivals",
+    "description": "Delicate pastel georgette blouse with soft color palette. Flowy fabric with subtle embellishments perfect for spring occasions.",
+    "images": [
+      "blouse-10-main.jpg"
+    ],
+    "tags": [
+      "georgette",
+      "pastel",
+      "soft",
+      "new"
+    ],
+    "featured": false
+  },
+  {
+    "id": 11,
+    "name": "Festive Kalamkari Print Blouse",
+    "slug": "festive-kalamkari-print-blouse",
+    "price": 2699,
+    "category": "Festive",
+    "description": "Authentic Kalamkari hand-painted design blouse. Traditional art form with intricate motifs, perfect for cultural celebrations.",
+    "images": [
+      "blouse-11-main.jpg",
+      "blouse-11-1.jpg"
+    ],
+    "tags": [
+      "kalamkari",
+      "hand-painted",
+      "traditional",
+      "festive"
+    ],
+    "featured": false
+  },
+  {
+    "id": 12,
+    "name": "Elegant Chikankari Work Blouse",
+    "slug": "elegant-chikankari-work-blouse",
+    "price": 2499,
+    "category": "Blouses",
+    "description": "Beautiful white chikankari embroidered blouse with delicate shadow work. Lightweight and comfortable, showcasing fine Lucknowi craftsmanship.",
+    "images": [
+      "blouse-12-main.jpg"
+    ],
+    "tags": [
+      "chikankari",
+      "lucknowi",
+      "white",
+      "delicate"
+    ],
+    "featured": false
+  },
+  {
+    "id": 13,
+    "name": "Bridal Velvet Embroidered Blouse",
+    "slug": "bridal-velvet-embroidered-blouse",
+    "price": 4299,
+    "category": "Bridal",
+    "description": "Luxurious velvet blouse with rich embroidery. Perfect for winter weddings, exuding warmth and elegance with premium fabric.",
+    "images": [
+      "blouse-13-main.jpg",
+      "blouse-13-1.jpg"
+    ],
+    "tags": [
+      "velvet",
+      "bridal",
+      "winter",
+      "luxury"
+    ],
+    "featured": false
+  },
+  {
+    "id": 14,
+    "name": "New Arrival Tie-Dye Blouse",
+    "slug": "new-arrival-tie-dye-blouse",
+    "price": 1599,
+    "category": "New Arrivals",
+    "description": "Trendy tie-dye pattern blouse in vibrant colors. Modern twist on traditional wear, perfect for casual ethnic styling.",
+    "images": [
+      "blouse-14-main.jpg"
+    ],
+    "tags": [
+      "tie-dye",
+      "vibrant",
+      "modern",
+      "casual"
+    ],
+    "featured": false
+  },
+  {
+    "id": 15,
+    "name": "Festive Organza Ruffled Blouse",
+    "slug": "festive-organza-ruffled-blouse",
+    "price": 2799,
+    "category": "Festive",
+    "description": "Elegant organza blouse with designer ruffled details. Flowy fabric with contemporary design elements for special occasions.",
+    "images": [
+      "blouse-15-main.jpg",
+      "blouse-15-1.jpg"
+    ],
+    "tags": [
+      "organza",
+      "ruffled",
+      "elegant",
+      "festive"
+    ],
+    "featured": false
+  },
+  {
+    "id": 16,
+    "name": "Classic Embroidered Satin Blouse",
+    "slug": "classic-embroidered-satin-blouse",
+    "price": 1999,
+    "category": "Blouses",
+    "description": "Smooth satin blouse with classic embroidery patterns. Versatile design that pairs well with various sarees and lehengas.",
+    "images": [
+      "blouse-16-main.jpg"
+    ],
+    "tags": [
+      "satin",
+      "classic",
+      "versatile",
+      "smooth"
+    ],
+    "featured": false
+  },
+  {
+    "id": 17,
+    "name": "Bridal Maroon Velvet with Peacock Motif",
+    "slug": "bridal-maroon-velvet-peacock-motif",
+    "price": 4999,
+    "category": "Bridal",
+    "description": "Exquisite maroon velvet blouse featuring intricate peacock motif embroidery. Handcrafted masterpiece for the modern bride.",
+    "images": [
+      "blouse-17-main.jpg",
+      "blouse-17-1.jpg",
+      "blouse-17-2.jpg"
+    ],
+    "tags": [
+      "bridal",
+      "velvet",
+      "peacock",
+      "maroon"
+    ],
+    "featured": true
+  },
+  {
+    "id": 18,
+    "name": "New Arrival Metallic Thread Blouse",
+    "slug": "new-arrival-metallic-thread-blouse",
+    "price": 3499,
+    "category": "New Arrivals",
+    "description": "Contemporary blouse with metallic thread embroidery creating a shimmer effect. Modern design with traditional craftsmanship.",
+    "images": [
+      "blouse-18-main.jpg"
+    ],
+    "tags": [
+      "metallic",
+      "shimmer",
+      "modern",
+      "contemporary"
+    ],
+    "featured": false
+  }
+]
