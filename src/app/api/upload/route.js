@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
  * Image upload handler for Netlify
  * Uses ImgBB free image hosting API to avoid serverless function timeouts
  * 
- * Alternative: Use Cloudinary (better, but requires API key setup)
+ * Requires: IMGBB_API_KEY environment variable in Netlify
  */
 
 export async function POST(request) {
@@ -22,7 +22,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' }, { status: 400 })
     }
 
-    // Validate file size (max 5MB)
+    // Validate file size (max 5MB for ImgBB)
     const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
       return NextResponse.json({ 
@@ -35,15 +35,13 @@ export async function POST(request) {
     const buffer = Buffer.from(bytes)
     const base64Image = buffer.toString('base64')
 
-    // Use ImgBB free API (no API key required for basic usage, but has rate limits)
-    // Get free API key from: https://api.imgbb.com/
-    // For now, we'll use a public endpoint or fallback to data URL for small images
-    
-    // Option 1: Try ImgBB if API key is set (optional)
+    // Get ImgBB API key from environment
     const imgbbApiKey = process.env.IMGBB_API_KEY
     
-    if (imgbbApiKey && file.size < 3 * 1024 * 1024) { // Only use ImgBB for images under 3MB
+    // Option 1: Use ImgBB if API key is set (for all images up to 5MB)
+    if (imgbbApiKey) {
       try {
+        // ImgBB API expects form data with key and image (base64 string)
         const imgbbFormData = new FormData()
         imgbbFormData.append('key', imgbbApiKey)
         imgbbFormData.append('image', base64Image)
@@ -53,28 +51,36 @@ export async function POST(request) {
           body: imgbbFormData,
         })
 
-        if (imgbbResponse.ok) {
-          const imgbbData = await imgbbResponse.json()
-          if (imgbbData.success && imgbbData.data) {
-            const timestamp = Date.now()
-            const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
-            const filename = `${timestamp}-${originalName}`
+        const imgbbData = await imgbbResponse.json()
 
-            return NextResponse.json({
-              success: true,
-              filename: filename,
-              path: imgbbData.data.url, // ImgBB URL
-              url: imgbbData.data.url,
-            })
-          }
+        if (imgbbResponse.ok && imgbbData.success && imgbbData.data && imgbbData.data.url) {
+          const timestamp = Date.now()
+          const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
+          const filename = `${timestamp}-${originalName}`
+
+          return NextResponse.json({
+            success: true,
+            filename: filename,
+            path: imgbbData.data.url, // ImgBB URL
+            url: imgbbData.data.url,
+          })
+        } else {
+          // ImgBB returned an error
+          const errorMsg = imgbbData?.error?.message || imgbbData?.error?.message || JSON.stringify(imgbbData)
+          console.error('ImgBB API error:', imgbbData)
+          return NextResponse.json({ 
+            error: `ImgBB upload failed: ${errorMsg}. Please check your IMGBB_API_KEY.` 
+          }, { status: 500 })
         }
       } catch (imgbbError) {
-        console.error('ImgBB upload failed, falling back to data URL:', imgbbError)
-        // Fall through to data URL method
+        console.error('ImgBB upload error:', imgbbError)
+        return NextResponse.json({ 
+          error: `ImgBB upload failed: ${imgbbError.message || imgbbError.toString()}. Please check your IMGBB_API_KEY in Netlify environment variables.` 
+        }, { status: 500 })
       }
     }
 
-    // Option 2: Fallback - Use data URL for smaller images only (to avoid timeout)
+    // Option 2: Fallback - Use data URL for small images only (if no ImgBB key)
     // Only use data URLs for images under 1MB to prevent 502 errors
     if (file.size > 1 * 1024 * 1024) {
       return NextResponse.json({ 
@@ -87,7 +93,7 @@ export async function POST(request) {
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-')
     const filename = `${timestamp}-${originalName}`
 
-    // Create data URL (only for small images)
+    // Create data URL (only for small images, no ImgBB key)
     const dataUrl = `data:${file.type};base64,${base64Image}`
 
     return NextResponse.json({
