@@ -38,6 +38,13 @@ export async function POST(request) {
     // Get ImgBB API key from environment
     const imgbbApiKey = process.env.IMGBB_API_KEY
     
+    // Debug: Log if key is found (don't log the actual key for security)
+    if (imgbbApiKey) {
+      console.log('ImgBB API key found, using ImgBB for upload')
+    } else {
+      console.log('ImgBB API key not found, will use data URL fallback for small images')
+    }
+    
     // Option 1: Use ImgBB if API key is set (for all images up to 5MB)
     if (imgbbApiKey) {
       try {
